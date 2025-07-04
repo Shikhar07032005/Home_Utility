@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Utility Tracker - Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #0a0a23;
+            color: #ffffff;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 400px;
+            background: rgba(0, 0, 50, 0.85);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 1;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: left;
+        }
+
+        .switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: inline-block;
+            width: 45px;
+            height: 25px;
+            z-index: 1000;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 19px;
+            width: 19px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .slider.round {
+            border-radius: 25px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a3a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .container {
+            background-color: rgba(10, 10, 35, 0.95);
+        }
+
+        body.dark-mode input,
+        body.dark-mode textarea,
+        body.dark-mode select {
+            background: #2a2a4a;
+            color: #ffffff;
+            border-color: #555;
+        }
+
+        body.dark-mode label {
+            color: #ffffff;
+        }
+
+        body.light-mode {
+            background-color: #f5f5f5;
+            color: #000000;
+            background-image: none;
+        }
+
+        body.light-mode .container {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        body.light-mode input,
+        body.light-mode textarea,
+        body.light-mode select {
+            background: #f0f0f0;
+            color: #000;
+            border-color: #ccc;
+        }
+
+        body.light-mode label {
+            color: #333;
+        }
+
+        body.light-mode button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        body.light-mode button:hover {
+            background-color: #0056b3;
+        }
+
+        body.light-mode h1,
+        body.light-mode h2 {
+            color: #000000;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+<div class="container">
+    <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider round"></span>
+    </label>
+
+    <h1>Home Utility Tracker</h1>
+    <div class="form-card">
+        <h2>Welcome back . . .</h2>
+
+        <form th:action="@{/login}" method="post" id="loginForm">
+            <input type="text" name="username" id="loginUsername" placeholder="Email" required>
+
+            <div class="password-container">
+                <input type="password" name="password" id="loginPassword" placeholder="Password" required>
+                <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
+            </div>
+
+            <button type="submit">Login</button>
+
+            <p class="error" th:if="${param.error}" th:text="'Invalid username or password.'" id="loginErrorMsg"></p>
+            <p th:if="${param.logout}" style="color:green;">You have been logged out successfully.</p>
+            <p class="error" id="loginError" style="display:none;"></p>
+            <p>Don't have an account? <a th:href="@{/register}">Sign up</a></p>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            body.classList.remove('light-mode');
+            darkModeToggle.checked = true;
+        } else {
+            body.classList.add('light-mode');
+            body.classList.remove('dark-mode');
+            darkModeToggle.checked = false;
+        }
+
+        darkModeToggle.addEventListener('change', () => {
+            body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        const loginForm = document.getElementById('loginForm');
+        const loginUsernameField = document.getElementById('loginUsername');
+        const loginPasswordField = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const loginErrorMsgFromBackend = document.getElementById('loginErrorMsg');
+
+        loginForm.addEventListener('submit', function(e) {
+            const username = loginUsernameField.value.trim();
+            const password = loginPasswordField.value.trim();
+            if (!username || !password) {
+                loginError.textContent = 'Please enter both username and password.';
+                loginError.style.display = 'block';
+                e.preventDefault();
+            } else {
+                loginError.style.display = 'none';
+            }
+        });
+
+        if (loginErrorMsgFromBackend) {
+            setTimeout(() => {
+                loginErrorMsgFromBackend.style.display = 'none';
+            }, 3000);
+        }
+    });
+
+    function togglePasswordVisibility() {
+        const passwordField = document.getElementById('loginPassword');
+        const toggleIcon = document.querySelector('.toggle-password');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.textContent = '🙈';
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.textContent = '👁️';
+        }
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Home Utility Tracker - Login</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            margin: 0;-->
+<!--            font-family: 'Segoe UI', sans-serif;-->
+<!--            background-color: #0a0a23;-->
+<!--            color: #ffffff;-->
+<!--            background-image: url('background.jpg');-->
+<!--            background-size: cover;-->
+<!--            background-position: center;-->
+<!--            transition: background-color 0.3s, color 0.3s;-->
+<!--            min-height: 100vh;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            flex-direction: column;-->
+<!--            padding: 20px;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            max-width: 400px;-->
+<!--            background: rgba(0, 0, 50, 0.85);-->
+<!--            padding: 2rem;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 0 15px rgba(0,0,0,0.4);-->
+<!--            position: relative;-->
+<!--            z-index: 1;-->
+<!--        }-->
+
+<!--        h1, h2 {-->
+<!--            text-align: center;-->
+<!--            color: #ffffff;-->
+<!--            margin-bottom: 1.5rem;-->
+<!--        }-->
+
+<!--        input, select, textarea, button {-->
+<!--            width: 100%;-->
+<!--            margin: 0.5rem 0;-->
+<!--            padding: 10px;-->
+<!--            border-radius: 8px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            font-size: 1rem;-->
+<!--            box-sizing: border-box;-->
+<!--            transition: background-color 0.3s, color 0.3s, border-color 0.3s;-->
+<!--        }-->
+
+<!--        .password-container {-->
+<!--            position: relative;-->
+<!--        }-->
+
+<!--        .toggle-password {-->
+<!--            position: absolute;-->
+<!--            right: 10px;-->
+<!--            top: 50%;-->
+<!--            transform: translateY(-50%);-->
+<!--            cursor: pointer;-->
+<!--            font-size: 1.2rem;-->
+<!--            color: #ccc;-->
+<!--        }-->
+
+<!--        button {-->
+<!--            background-color: #007bff;-->
+<!--            color: white;-->
+<!--            cursor: pointer;-->
+<!--            border: none;-->
+<!--        }-->
+
+<!--        button:hover {-->
+<!--            background-color: #0056b3;-->
+<!--        }-->
+
+<!--        .error {-->
+<!--            color: red;-->
+<!--            font-size: 0.9rem;-->
+<!--            margin-top: 0.5rem;-->
+<!--            text-align: left;-->
+<!--        }-->
+
+<!--        .switch {-->
+<!--            position: fixed;-->
+<!--            top: 20px;-->
+<!--            right: 20px;-->
+<!--            display: inline-block;-->
+<!--            width: 45px;-->
+<!--            height: 25px;-->
+<!--            z-index: 1000;-->
+<!--        }-->
+
+<!--        .switch input {-->
+<!--            opacity: 0;-->
+<!--            width: 0;-->
+<!--            height: 0;-->
+<!--        }-->
+
+<!--        .slider {-->
+<!--            position: absolute;-->
+<!--            cursor: pointer;-->
+<!--            top: 0;-->
+<!--            left: 0;-->
+<!--            right: 0;-->
+<!--            bottom: 0;-->
+<!--            background-color: #ccc;-->
+<!--            transition: .4s;-->
+<!--        }-->
+
+<!--        .slider:before {-->
+<!--            position: absolute;-->
+<!--            content: "";-->
+<!--            height: 19px;-->
+<!--            width: 19px;-->
+<!--            left: 3px;-->
+<!--            bottom: 3px;-->
+<!--            background-color: white;-->
+<!--            transition: .4s;-->
+<!--        }-->
+
+<!--        input:checked + .slider {-->
+<!--            background-color: #007bff;-->
+<!--        }-->
+
+<!--        input:focus + .slider {-->
+<!--            box-shadow: 0 0 1px #007bff;-->
+<!--        }-->
+
+<!--        input:checked + .slider:before {-->
+<!--            transform: translateX(20px);-->
+<!--        }-->
+
+<!--        .slider.round {-->
+<!--            border-radius: 25px;-->
+<!--        }-->
+
+<!--        .slider.round:before {-->
+<!--            border-radius: 50%;-->
+<!--        }-->
+
+<!--        body.dark-mode {-->
+<!--            background-color: #1a1a3a;-->
+<!--            color: #ffffff;-->
+<!--        }-->
+
+<!--        body.dark-mode .container {-->
+<!--            background-color: rgba(10, 10, 35, 0.95);-->
+<!--        }-->
+
+<!--        body.dark-mode input,-->
+<!--        body.dark-mode textarea,-->
+<!--        body.dark-mode select {-->
+<!--            background: #2a2a4a;-->
+<!--            color: #ffffff;-->
+<!--            border-color: #555;-->
+<!--        }-->
+
+<!--        body.dark-mode label {-->
+<!--            color: #ffffff;-->
+<!--        }-->
+
+<!--        body.light-mode {-->
+<!--            background-color: #f5f5f5;-->
+<!--            color: #000000;-->
+<!--            background-image: none;-->
+<!--        }-->
+
+<!--        body.light-mode .container {-->
+<!--            background: rgba(255, 255, 255, 0.95);-->
+<!--            box-shadow: 0 0 15px rgba(0,0,0,0.2);-->
+<!--        }-->
+
+<!--        body.light-mode input,-->
+<!--        body.light-mode textarea,-->
+<!--        body.light-mode select {-->
+<!--            background: #f0f0f0;-->
+<!--            color: #000;-->
+<!--            border-color: #ccc;-->
+<!--        }-->
+
+<!--        body.light-mode label {-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        body.light-mode button {-->
+<!--            background-color: #007bff;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        body.light-mode button:hover {-->
+<!--            background-color: #0056b3;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body class="dark-mode">-->
+<!--<div class="container">-->
+<!--    <label class="switch">-->
+<!--        <input type="checkbox" id="darkModeToggle">-->
+<!--        <span class="slider round"></span>-->
+<!--    </label>-->
+
+<!--    <h1>Home Utility Tracker</h1>-->
+<!--    <div class="form-card">-->
+<!--        <h2>Welcome back . . .</h2>-->
+
+<!--        <form th:action="@{/login}" method="post" id="loginForm">-->
+<!--            <input type="text" name="username" id="loginUsername" placeholder="Email" required>-->
+
+<!--            <div class="password-container">-->
+<!--                <input type="password" name="password" id="loginPassword" placeholder="Password" required>-->
+<!--                <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>-->
+<!--            </div>-->
+
+<!--            <button type="submit">Login</button>-->
+
+<!--            <p class="error" th:if="${param.error}" th:text="'Invalid username or password.'" id="loginErrorMsg"></p>-->
+<!--            <p th:if="${param.logout}" style="color:green;">You have been logged out successfully.</p>-->
+<!--            <p class="error" id="loginError" style="display:none;"></p>-->
+<!--            <p>Don't have an account? <a th:href="@{/register}">Sign up</a></p>-->
+<!--        </form>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', () => {-->
+<!--        const darkModeToggle = document.getElementById('darkModeToggle');-->
+<!--        const body = document.body;-->
+<!--        const savedTheme = localStorage.getItem('theme');-->
+
+<!--        if (savedTheme === 'dark') {-->
+<!--            body.classList.add('dark-mode');-->
+<!--            body.classList.remove('light-mode');-->
+<!--            darkModeToggle.checked = true;-->
+<!--        } else {-->
+<!--            body.classList.add('light-mode');-->
+<!--            body.classList.remove('dark-mode');-->
+<!--            darkModeToggle.checked = false;-->
+<!--        }-->
+
+<!--        darkModeToggle.addEventListener('change', () => {-->
+<!--            body.classList.toggle('dark-mode');-->
+<!--            body.classList.toggle('light-mode');-->
+<!--            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');-->
+<!--        });-->
+
+<!--        const loginForm = document.getElementById('loginForm');-->
+<!--        const loginUsernameField = document.getElementById('loginUsername');-->
+<!--        const loginPasswordField = document.getElementById('loginPassword');-->
+<!--        const loginError = document.getElementById('loginError');-->
+<!--        const loginErrorMsgFromBackend = document.getElementById('loginErrorMsg');-->
+
+<!--        loginForm.addEventListener('submit', function(e) {-->
+<!--            const username = loginUsernameField.value.trim();-->
+<!--            const password = loginPasswordField.value.trim();-->
+<!--            if (!username || !password) {-->
+<!--                loginError.textContent = 'Please enter both username and password.';-->
+<!--                loginError.style.display = 'block';-->
+<!--                e.preventDefault();-->
+<!--            } else {-->
+<!--                loginError.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
+
+<!--        if (loginErrorMsgFromBackend) {-->
+<!--            setTimeout(() => {-->
+<!--                loginErrorMsgFromBackend.style.display = 'none';-->
+<!--            }, 3000);-->
+<!--        }-->
+<!--    });-->
+
+<!--    function togglePasswordVisibility() {-->
+<!--        const passwordField = document.getElementById('loginPassword');-->
+<!--        const toggleIcon = document.querySelector('.toggle-password');-->
+<!--        if (passwordField.type === 'password') {-->
+<!--            passwordField.type = 'text';-->
+<!--            toggleIcon.textContent = '🙈';-->
+<!--        } else {-->
+<!--            passwordField.type = 'password';-->
+<!--            toggleIcon.textContent = '👁️';-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

@@ -1,0 +1,55 @@
+<!-- utility_form.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Utility - Tracker</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body class="dark-mode">
+<div class="container">
+    <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider round"></span>
+    </label>
+
+    <h2>Add New Utility</h2>
+
+    <form th:action="@{/add-utility}" th:object="${utilityBill}" method="post">
+        <input type="hidden" th:field="*{id}">
+
+        <select th:field="*{utilityType.id}" required>
+            <option value="">Select Utility Type</option>
+            <option th:each="type : ${utilityTypes}"
+                    th:value="${type.id}"
+                    th:text="${type.name}">
+            </option>
+        </select>
+
+        <input type="number" th:field="*{amount}" placeholder="Bill Amount (₹)" required min="0">
+        <label for="billDate">Bill Date</label>
+        <input type="date" th:field="*{billDate}" placeholder="Bill Date" required>
+        <label for="dueDate">Due Date</label>
+        <input type="date" th:field="*{dueDate}" placeholder="Due Date" required>
+        <input type="text" th:field="*{consumption}" placeholder="Consumption (e.g. 250 kWh)">
+        <textarea th:field="*{notes}" placeholder="Notes"></textarea>
+
+        <label for="markPaid">Mark as Paid
+            <input type="checkbox" id="markPaid" th:field="*{paid}">
+        </label>
+        <div id="paymentDateGroup" style="display: none;">
+            <label for="paymentDate">Payment Date</label>
+            <input type="date" id="paymentDate" th:field="*{paymentDate}">
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit">Save Bill</button>
+            <a th:href="@{/home}" class="back-button">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

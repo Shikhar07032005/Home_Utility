@@ -1,0 +1,35 @@
+<!-- home.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Utility Tracker</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body class="dark-mode">
+<div class="container home">
+    <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider round"></span>
+    </label>
+
+    <h2>Welcome, <span th:text="${fullName}">User</span>!</h2>
+
+    <nav class="nav-buttons">
+        <a th:href="@{/add-utility}">Add New Utility</a>
+        <a th:href="@{/dashboard}">View Utilities</a>
+        <form th:action="@{/generate-pdf}" method="post">
+            <button type="submit">Generate PDF</button>
+        </form>
+    </nav>
+
+    <!-- Logout via Spring Security -->
+    <form th:action="@{/logout}" method="post">
+        <button class="back-button" type="submit">Log Out</button>
+    </form>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

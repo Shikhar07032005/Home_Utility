@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Utility Tracker</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #222;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 90%;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        td {
+            color: #222;
+        }
+
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .actions a {
+            margin: 0 6px;
+            text-decoration: none;
+            color: #4da6ff;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background-color: #555;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+    background-color: #1a1a3a;
+    color: #ffffff;
+}
+
+body.dark-mode .dashboard-container {
+    background-color: rgba(10, 10, 35, 0.95);
+}
+
+        body.dark-mode table {
+            background-color: transparent;
+        }
+
+        body.dark-mode th {
+            background-color: #1a1a40;
+            color: #fff;
+        }
+
+        body.dark-mode td {
+            color: #ddd;
+        }
+
+        body.dark-mode tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .back-button {
+            background-color: #222;
+        }
+
+        body.dark-mode .back-button:hover {
+            background-color: #444;
+        }
+
+        /* Dark mode toggle switch */
+        .switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 34px;
+            cursor: pointer;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+
+    <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider"></span>
+    </label>
+
+    <h2>Utility Dashboard</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Bill Date</th>
+            <th>Paid</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="bill : ${bills}">
+            <td th:text="${bill.utilityType.name}">Type</td>
+            <td th:text="${bill.amount}">Amount</td>
+            <td th:text="${bill.billDate}">Bill Date</td>
+            <td th:text="${bill.paid ? 'Yes' : 'No'}">Paid</td>
+            <td class="actions">
+                <a th:href="@{'/edit-bill/' + ${bill.id}}">Edit</a>
+                <a th:href="@{'/delete-bill/' + ${bill.id}}" onclick="return confirm('Are you sure?')">Delete</a>
+                <a th:if="${!bill.paid}" th:href="@{'/mark-paid/' + ${bill.id}}">Mark as Paid</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/home}" class="back-button">Go Back</a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggle.checked = true;
+        }
+
+        toggle.addEventListener('change', function () {
+            if (this.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
